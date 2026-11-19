@@ -119,7 +119,11 @@ jobs:
         run: |
           # Only ${{ env.DEVICE_NAME }} use it.
           cd $GITHUB_WORKSPACE/device_kernel
-          # Nothing
+          for opt in CONFIG_DEBUG_KERNEL CONFIG_KALLSYMS CONFIG_KALLSYMS_ALL; do
+            sed -i "/^${opt}=/d;/^# ${opt} is not set/d" arch/${{ env.KERNEL_ARCH }}/configs/${{ env.DEFCONFIG_NAME }}
+            echo "${opt}=y" >> arch/${{ env.KERNEL_ARCH }}/configs/${{ env.DEFCONFIG_NAME }}
+          done
+          grep -E "^CONFIG_(DEBUG_KERNEL|KALLSYMS|KALLSYMS_ALL)=" arch/${{ env.KERNEL_ARCH }}/configs/${{ env.DEFCONFIG_NAME }}
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
